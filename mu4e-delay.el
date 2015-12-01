@@ -4,7 +4,7 @@
 
 ;; Author: Ben Maughan <benmaughan@gmail.com>
 ;; URL: http://www.pragmaticemacs.com
-;; Package-Version:
+;; Package-Version: 20151201
 ;; Version: 0.1.0
 ;; Keywords: email
 
@@ -191,15 +191,22 @@
                      (>= (nth 1 deadline) 0))
                 ;;message is ready to go
                 (progn (message "Sending delayed article %s..." f)
+
+                       ;;uncomment to use smtpmail
                        ;;(smtpmail-send-it)
                        (sendmail-send-it)
+
                        ;;uncomment to backup messages for testing
                        ;;make sure directory exists
                        ;; (rename-file f
                        ;;              (expand-file-name
                        ;;               (concat "~/tmp/delayed-sent-mail/"
                        ;;                       (file-name-nondirectory f))) t)
-                       ;;(message "Sending delayed article %s...done" f)
+
+                       ;;comment out next line if backing up file above
+                       (delete-file f)
+
+                       ;;kill tmp buffer
                        (kill-buffer (current-buffer))
                        (message "...done"))
               ;;message not ready yet
@@ -248,5 +255,5 @@
 ;;initialise
 (mu4e-delay-initialise-send-delay)
 
-(provide 'mu4e-dely)
+(provide 'mu4e-delay)
 ;;; mu4e-delay.el ends here

@@ -1,11 +1,11 @@
 ;;; mu4e-delay.el --- delay sending emails with mu4e -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Ben Maughan <benmaughan@gmail.com>
+;; Copyright (C) 2016  Ben Maughan <benmaughan@gmail.com>
 
 ;; Author: Ben Maughan <benmaughan@gmail.com>
 ;; URL: http://www.pragmaticemacs.com
-;; Package-Version: 20151201
-;; Version: 0.1.0
+;; Package-Version: 20160205
+;; Version: 0.1.1
 ;; Keywords: email
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -158,12 +158,35 @@
           (t (error "Malformed delay `%s'" delay)))
     (message-add-header (format "%s: %s" mu4e-delay-header deadline))))
 
+;;helper functions to check for attachments
+;;code adapted from John Kitchin's comment at
+;;http://pragmaticemacs.com/emacs/email-attachment-reminders-in-mu4e/
+(defun mu4e-delay-email-says-attach-p ()
+  "Return t if email suggests there could be an attachment."
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward   "attach\\|\Wfiles?\W\\|\Wphoto\\|\Where\s-+is\\|\Where\s-+are\\|\Where\s-+it\s-+is\\|enclose\\|\Wdraft\\|pdf\\|\Wversion" nil t)))
+
+(defun mu4e-delay-email-has-attachment-p ()
+  "Return t if the currently open email has an attachment"
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward "<#part" nil t)))
+
 ;;use this function to "send" the mail with a delay
 (defun mu4e-delay-send (arg)
   "Add delay header and save to drafts.
 
   If used with a prefix argument then send without delay."
   (interactive "P")
+
+  ;;check and warn about attachments
+  (when (or (mu4e-delay-email-says-attach-p)
+             (mu4e-delay-email-has-attachment-p))
+    (unless
+        (y-or-n-p "Attachment detected, or you have mentioned an attachment. mu4e-delay-send does not currently support attachments. Send with delay anyway?")
+      (error "Aborting send.")))
+
   (if arg
       ;;just send
       (message-send-and-exit)

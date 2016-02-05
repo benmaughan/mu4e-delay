@@ -1,0 +1,63 @@
+* Overview
+This package is intended mainly to provide the functionality of
+adding a delay to the sending of an email so that the email can be
+retrieved and edited before it is really sent. This is equivalent
+to the "send later" extension in thunderbird, or the "undo send"
+option in gmail. The package also supports scheduling of emails to
+be send at a specific date and time.
+
+The code is based closely on =gnus-delay=, and adds a header
+specifying a time at which to send the email. The mail is then saved
+to the user's draft folder. A scheduled process runs (every minute by
+default) and checks all mails in the draft folder and sends any that
+are due.
+
+The function =mu4e-delay-add-delay-header= adds the delay header and
+can be called interactively to add delay times in different formats.
+More usefully, one would replace the normal send function in mu4e with
+=mu4e-delay-send= which adds the default delay of 2 minutes and then
+saves the message to the draft folder and buries the message buffer,
+giving the user the impression of having sent the message. This is
+bound to =C-c C-l= (mnemonic: l for send later) by default, so just
+use that instead of =C-c C-c= to send your email.
+
+The function =mu4e-delay-send-delayed-mails= loops over all mails in
+the draft folder looking for the delay header. If any messages are due
+to be sent then it sends them. The messages are checked with the
+function =mu4e-delay-check-file-and-send-if-due= which sends any due
+mail. Mail can be sent with =smtpmail-send-it= or =sendmail-sent-it=
+(currently by commenting the code). Sendmail is much preferred as
+=smtpmail-send-it= runs synchronously so will interrupt (briefly, but
+annoyingly) whatever you are doing when the timer runs and it finds
+mail to send. For more invisible use, configure a version of sendmail
+on your system and set up mu4e to use that.
+
+* Undo send
+A delayed email is easily recovered by finding it in the draft folder
+and then editing it and removing the delay header and saving it. This
+will prevent it from being sent until you re-send (or delay) it.
+
+* Limitations
+A known limitation is that attachments are not sent properly when the
+mail is delayed. I've not worked out why this is yet! The package
+checks to see if you have an attachment and warns you about this.
+
+* Warning
+Emails are important and I'd hate you to get into trouble because
+something went wrong an e.g. a mail did not get sent. I strongly
+recommend (at least at first) uncommenting the code to bcc all
+outgoing mail to a spare email address so you can check things are
+being sent ok. I have used this package for several months without
+problems, but be careful!
+
+* Quick start
+Put the =mu4e-delay.el= file somewhere on you system and then add the
+following to your =init.el= file
+
+#+BEGIN_SRC elisp
+  (add-to-list 'load-path "/path/to/directory")
+  (require 'mu4e-delay)
+#+END_SRC
+
+* Author
+Ben Maughan [[http://pragmaticemacs.com]]

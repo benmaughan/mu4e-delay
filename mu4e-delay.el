@@ -165,7 +165,7 @@
   "Return t if email suggests there could be an attachment."
   (save-excursion
     (goto-char (point-min))
-    (re-search-forward   "attach\\|\Wfiles?\W\\|\Wphoto\\|\Where\s-+is\\|\Where\s-+are\\|\Where\s-+it\s-+is\\|enclose\\|\Wdraft\\|pdf\\|\Wversion" nil t)))
+    (re-search-forward   "^[^>].*attach\\|^[^>].*\Wfiles?\W\\|^[^>].*\Wphoto\\|^[^>].*\Where\s-+is\\|^[^>].*\Where\s-+are\\|^[^>].*\Where\s-+it\s-+is\\|^[^>].*enclose\\|^[^>].*\Wdraft\\|^[^>].*pdf\\|^[^>].*\Wversion" nil t)))
 
 (defun mu4e-delay-email-has-attachment-p ()
   "Return t if the currently open email has an attachment"

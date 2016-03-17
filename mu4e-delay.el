@@ -219,6 +219,9 @@
                        ;;(smtpmail-send-it)
                        (sendmail-send-it)
 
+                       ;;mark parent as replied to if needed
+                       (mu4e~compose-set-parent-flag f)
+
                        ;;uncomment to backup messages for testing
                        ;;make sure directory exists
                        ;; (rename-file f

@@ -4,8 +4,8 @@
 
 ;; Author: Ben Maughan <benmaughan@gmail.com>
 ;; URL: http://www.pragmaticemacs.com
-;; Package-Version: 20160205
-;; Version: 0.1.1
+;; Package-Version: 20160322
+;; Version: 0.1.2
 ;; Keywords: email
 
 ;; This file is free software; you can redistribute it and/or modify

@@ -26,11 +26,11 @@ the draft folder looking for the delay header. If any messages are due
 to be sent then it sends them. The messages are checked with the
 function =mu4e-delay-check-file-and-send-if-due= which sends any due
 mail. Mail can be sent with =smtpmail-send-it= or =sendmail-sent-it=
-(currently by commenting the code). Sendmail is much preferred as
-=smtpmail-send-it= runs synchronously so will interrupt (briefly, but
-annoyingly) whatever you are doing when the timer runs and it finds
-mail to send. For more invisible use, configure a version of sendmail
-on your system and set up mu4e to use that.
+(given by the value of =send-mail-function=). Sendmail is much
+preferred as =smtpmail-send-it= runs synchronously so will interrupt
+(briefly, but annoyingly) whatever you are doing when the timer runs
+and it finds mail to send. For more invisible use, configure a version
+of sendmail on your system and set up mu4e to use that.
 
 * Undo send
 A delayed email is easily recovered by finding it in the draft folder
@@ -45,10 +45,12 @@ checks to see if you have an attachment and warns you about this.
 * Warning
 Emails are important and I'd hate you to get into trouble because
 something went wrong an e.g. a mail did not get sent. I strongly
-recommend (at least at first) uncommenting the code to bcc all
-outgoing mail to a spare email address so you can check things are
-being sent ok. I have used this package for several months without
-problems, but be careful!
+recommend (at least at first) setting the variables
+=mu4e-delay-bcc-address= to bcc all outgoing mail to a spare email
+address so you can check things are being sent ok. You can also set
+=mu4e-delay-backup-directory= to backup all delayed mail to a given
+directory rather than deleting it. I have used this package for
+several months without problems, but be careful!
 
 * Quick start
 Put the =mu4e-delay.el= file somewhere on you system and then add the

@@ -47,7 +47,7 @@
 ;; are due to be sent then it sends them. The messages are checked
 ;; with the function `mu4e-delay-check-file-and-send-if-due' which
 ;; sends any due mail. Mail can be sent with `smtpmail-send-it' or
-;; `sendmail-sent-it' (currently by commenting the code). Sendmail is
+;; `sendmail-sent-it' (as given by `send-mail-function'). Sendmail is
 ;; much preferred as `smtpmail-send-it' runs synchronously so will
 ;; interrupt (briefly) whatever you are doing when the timer runs and
 ;; it finds mail to send. For more invisible use, configure a version
@@ -88,12 +88,12 @@
   :type 'integer
   :group 'mu4e-delay)
 
-(defcustom mu4e-delay-backup-directory "~/tmp/arse"
+(defcustom mu4e-delay-backup-directory nil
   "Backup delayed mail to this directory after sending if non-nil. Useful for testing."
   :type 'string
   :group 'mu4e-delay)
 
-(defcustom mu4e-delay-bcc-address "benmaughan@gmail.com"
+(defcustom mu4e-delay-bcc-address nil
   "BCC all outgoing mail to this address if non-nil. Useful for testing."
   :type 'string
   :group 'mu4e-delay)

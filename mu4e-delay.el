@@ -4,8 +4,8 @@
 
 ;; Author: Ben Maughan <benmaughan@gmail.com>
 ;; URL: http://www.pragmaticemacs.com
-;; Package-Version: 20160322
-;; Version: 0.1.2
+;; Package-Version: 20160413
+;; Version: 0.1.3
 ;; Keywords: email
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -74,18 +74,28 @@
   :group 'mu4e-delay)
 
 (defcustom mu4e-delay-default-delay "2m"
-  "*Default length of delay."
+  "Default length of delay."
   :type 'string
   :group 'mu4e-delay)
 
 (defcustom mu4e-delay-default-hour 8
-  "*If deadline is given as date, then assume this time of day."
+  "If deadline is given as date, then assume this time of day."
   :type 'integer
   :group 'mu4e-delay)
 
 (defcustom mu4e-delay-default-timer 60
   "Default number of seconds between checks for delayed mail to send."
   :type 'integer
+  :group 'mu4e-delay)
+
+(defcustom mu4e-delay-backup-directory "~/tmp/arse"
+  "Backup delayed mail to this directory after sending if non-nil. Useful for testing."
+  :type 'string
+  :group 'mu4e-delay)
+
+(defcustom mu4e-delay-bcc-address "benmaughan@gmail.com"
+  "BCC all outgoing mail to this address if non-nil. Useful for testing."
+  :type 'string
   :group 'mu4e-delay)
 
 ;;taken from gnus-delay
@@ -182,7 +192,7 @@
 
   ;;check and warn about attachments
   (when (or (mu4e-delay-email-says-attach-p)
-             (mu4e-delay-email-has-attachment-p))
+            (mu4e-delay-email-has-attachment-p))
     (unless
         (y-or-n-p "Attachment detected, or you have mentioned an attachment. mu4e-delay-send does not currently support attachments. Send with delay anyway?")
       (error "Aborting send.")))
@@ -212,29 +222,34 @@
             (setq deadline (time-since deadline))
             (if (and (>= (nth 0 deadline) 0)
                      (>= (nth 1 deadline) 0))
+
                 ;;message is ready to go
-                (progn (message "Sending delayed article %s..." f)
+                (progn
+                  ;;(message "Sending delayed article %s..." f)
 
-                       ;;uncomment to use smtpmail
-                       ;;(smtpmail-send-it)
-                       (sendmail-send-it)
+                  ;;send mail with user specified function
+                  (funcall send-mail-function)
 
-                       ;;mark parent as replied to if needed
-                       (mu4e~compose-set-parent-flag f)
+                  ;;mark parent as replied to if needed
+                  (mu4e~compose-set-parent-flag f)
 
-                       ;;uncomment to backup messages for testing
-                       ;;make sure directory exists
-                       ;; (rename-file f
-                       ;;              (expand-file-name
-                       ;;               (concat "~/tmp/delayed-sent-mail/"
-                       ;;                       (file-name-nondirectory f))) t)
+                  ;;backup before deleting if needed
+                  (if mu4e-delay-backup-directory
+                      ;;make sure directory exists
+                      (progn
+                        (unless (file-directory-p mu4e-delay-backup-directory)
+                        (error "Directory %s needed but doesn't exist" mu4e-delay-backup-directory))
+                    ;;backup by moving file
+                    (rename-file f
+                                 (expand-file-name
+                                  (concat mu4e-delay-backup-directory "/"
+                                          (file-name-nondirectory f))) t))
+                    ;;else delete file
+                    (delete-file f))
 
-                       ;;comment out next line if backing up file above
-                       (delete-file f)
+                  ;;kill tmp buffer
+                  (kill-buffer (current-buffer)))
 
-                       ;;kill tmp buffer
-                       (kill-buffer (current-buffer))
-                       (message "...done"))
               ;;message not ready yet
               (progn
                 ;;(message "Pending delayed article %s" f)
@@ -259,7 +274,7 @@
     ;;update index
     (mu4e-update-index)))
 
-;;set it up
+;;set up timer
 (defvar mu4e-delay-send-timer nil
   "Timer to run `mu4e-delay-send-delayed-mails'")
 
@@ -269,14 +284,24 @@
   (setq mu4e-delay-send-timer
         (run-with-timer 0 mu4e-delay-default-timer 'mu4e-delay-send-delayed-mails)))
 
+;;check backup dir exists if needed
+(if mu4e-delay-backup-directory
+    (progn
+      (unless (file-directory-p mu4e-delay-backup-directory)
+        (if (y-or-n-p (concat "Directory " mu4e-delay-backup-directory " doesn't exist. Create now?"))
+            (make-directory mu4e-delay-backup-directory)
+          (error "Directory %s needed but doesn't exist" mu4e-delay-backup-directory)))))
+
 ;;bind it
 (define-key mu4e-compose-mode-map (kbd "C-c C-l") 'mu4e-delay-send)
 
-;;bcc everything to me for testing - uncomment to use
-;; (add-hook 'mu4e-compose-mode-hook
-;;           (defun my-add-bcc ()
-;;             "Add a Bcc: header."
-;;             (save-excursion (message-add-header "Bcc: my-bcc-address@gmail.com\n"))))
+;;bcc everything to given address
+(if mu4e-delay-bcc-address
+    (progn
+      (add-hook 'mu4e-compose-mode-hook
+                (defun my-add-bcc ()
+                  "Add a Bcc: header."
+                  (save-excursion (message-add-header (concat "Bcc: " mu4e-delay-bcc-address "\n")))))))
 
 ;;initialise
 (mu4e-delay-initialise-send-delay)

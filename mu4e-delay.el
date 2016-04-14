@@ -190,6 +190,14 @@
   If used with a prefix argument then send without delay."
   (interactive "P")
 
+  ;;check backup dir exists if needed
+  (if mu4e-delay-backup-directory
+      (progn
+        (unless (file-directory-p mu4e-delay-backup-directory)
+          (if (y-or-n-p (concat "Directory " mu4e-delay-backup-directory " doesn't exist. Create now?"))
+              (make-directory mu4e-delay-backup-directory)
+            (error "Directory %s needed but doesn't exist" mu4e-delay-backup-directory)))))
+
   ;;check and warn about attachments
   (when (or (mu4e-delay-email-says-attach-p)
             (mu4e-delay-email-has-attachment-p))
@@ -284,13 +292,6 @@
   (setq mu4e-delay-send-timer
         (run-with-timer 0 mu4e-delay-default-timer 'mu4e-delay-send-delayed-mails)))
 
-;;check backup dir exists if needed
-(if mu4e-delay-backup-directory
-    (progn
-      (unless (file-directory-p mu4e-delay-backup-directory)
-        (if (y-or-n-p (concat "Directory " mu4e-delay-backup-directory " doesn't exist. Create now?"))
-            (make-directory mu4e-delay-backup-directory)
-          (error "Directory %s needed but doesn't exist" mu4e-delay-backup-directory)))))
 
 ;;bind it
 (define-key mu4e-compose-mode-map (kbd "C-c C-l") 'mu4e-delay-send)

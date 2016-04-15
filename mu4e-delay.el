@@ -39,19 +39,22 @@
 ;; be called interactively to add delay times in different formats.
 ;; More usually, one would replace the normal send function in mu4e
 ;; with `mu4e-delay-send' which adds the default delay of 2 minutes
-;; and saves the message to the draft folder, giving the user the
-;; impression of having sent the message.
+;; (customised with `mu4e-delay-default-delay') and saves the message
+;; to the draft folder, giving the user the impression of having sent
+;; the message.
 ;;
 ;; The function `mu4e-delay-send-delayed-mails' loops over all mails
-;; in the draft folder looking for the delay header. If any messages
-;; are due to be sent then it sends them. The messages are checked
-;; with the function `mu4e-delay-check-file-and-send-if-due' which
-;; sends any due mail. Mail can be sent with `smtpmail-send-it' or
-;; `sendmail-sent-it' (as given by `send-mail-function'). Sendmail is
-;; much preferred as `smtpmail-send-it' runs synchronously so will
-;; interrupt (briefly) whatever you are doing when the timer runs and
-;; it finds mail to send. For more invisible use, configure a version
-;; of sendmail on your system and set up mu4e to use that.
+;; in the draft folder looking for the delay header. This runs on a
+;; timer every minute by default (customised with
+;; `mu4e-delay-default-timer'). If any messages are due to be sent
+;; then it sends them. The messages are checked with the function
+;; `mu4e-delay-check-file-and-send-if-due' which sends any due mail.
+;; Mail can be sent with `smtpmail-send-it' or `sendmail-sent-it' (as
+;; given by `send-mail-function'). Sendmail is much preferred as
+;; `smtpmail-send-it' runs synchronously so will interrupt (briefly)
+;; whatever you are doing when the timer runs and it finds mail to
+;; send. For more invisible use, configure a version of sendmail on
+;; your system and set up mu4e to use that.
 ;;
 ;; A delayed email is easily recovered by finding it in the draft
 ;; folder and then editing it and removing the delay header and saving
